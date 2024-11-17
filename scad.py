@@ -17,7 +17,7 @@ def make_scad(**kwargs):
         #filter = "test"
 
         kwargs["save_type"] = "none"
-        #kwargs["save_type"] = "all"
+        kwargs["save_type"] = "all"
         
         navigation = False
         #navigation = True    
@@ -31,9 +31,9 @@ def make_scad(**kwargs):
     # default variables
     if True:
         kwargs["size"] = "oobb"
-        kwargs["width"] = 1
-        kwargs["height"] = 1
-        kwargs["thickness"] = 3
+        kwargs["width"] = 5
+        kwargs["height"] = 3
+        kwargs["thickness"] = 9
         
     # project_variables
     if True:
@@ -110,6 +110,54 @@ def get_base(thing, **kwargs):
     pos1 = copy.deepcopy(pos)         
     p3["pos"] = pos1
     oobb_base.append_full(thing,**p3)
+
+    #add cutouts for mounting
+    p3 = copy.deepcopy(kwargs)
+    p3["type"] = "n"
+    p3["shape"] = f"oobb_cylinder"
+    p3["depth"] = 6
+    p3["radius"] = 4
+    p3["holes"] = "mounting"
+    #p3["m"] = "#"
+    pos1 = copy.deepcopy(pos)
+    spacing = 37/2
+    pos1[0] += -spacing
+    pos2 = copy.deepcopy(pos)
+    pos2[0] += spacing
+    poss = [pos1, pos2]
+    p3["pos"] = poss
+    p3["zz"]= "bottom"
+    oobb_base.append_full(thing,**p3)
+
+    #add holes
+    p3 = copy.deepcopy(kwargs)
+    p3["type"] = "n"
+    p3["shape"] = f"oobb_hole"
+    p3["depth"] = depth
+    p3["radius_name"] = "m3"
+    #p3["m"] = "#"
+    p3["pos"] = poss
+    oobb_base.append_full(thing,**p3)
+
+    #add cube cutout
+    p3 = copy.deepcopy(kwargs)
+    p3["type"] = "n"
+    p3["shape"] = f"oobb_cube"
+    ex = 3
+    w = 28 + ex
+    h = 32 + ex
+    d = depth
+    size = [w,h,d]
+    p3["size"] = size
+    p3["m"] = "#"
+    pos1 = copy.deepcopy(pos)
+    pos1[0] += 0
+    pos1[1] += 11
+    pos1[2] += 0
+    p3["pos"] = pos1
+    oobb_base.append_full(thing,**p3)
+
+
 
     if prepare_print:
         #put into a rotation object
